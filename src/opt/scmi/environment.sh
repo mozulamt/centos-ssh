@@ -4,7 +4,7 @@
 readonly DOCKER_IMAGE_NAME=centos-ssh
 readonly DOCKER_IMAGE_RELEASE_TAG_PATTERN='^[1-2]\.[0-9]+\.[0-9]+$'
 readonly DOCKER_IMAGE_TAG_PATTERN='^(latest|[1-2]\.[0-9]+\.[0-9]+)$'
-readonly DOCKER_USER=jdeathe
+readonly DOCKER_USER=mozulamt
 
 # ------------------------------------------------------------------------------
 # Variables

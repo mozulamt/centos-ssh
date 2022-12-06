@@ -42,7 +42,7 @@ services:
       SSH_USER_PRIVATE_KEY: "${SSH_USER_PRIVATE_KEY}"
       SSH_USER_SHELL: "${SSH_USER_SHELL}"
       SYSTEM_TIMEZONE: "${SYSTEM_TIMEZONE}"
-    image: "jdeathe/centos-ssh:latest"
+    image: "nmaumenee/centos-ssh:latest"
     ports:
       - "2020:22"
     restart: "always"

@@ -1,6 +1,6 @@
-FROM centos:7.6.1810
+FROM centos:7.9.2009
 
-ARG RELEASE_VERSION="2.6.1"
+ARG RELEASE_VERSION="2.6.2"
 
 # ------------------------------------------------------------------------------
 # - Import the RPM GPG keys for repositories
@@ -15,24 +15,25 @@ RUN rpm --rebuilddb \
 	&& rpm --import \
 		https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7 \
 	&& rpm --import \
-		https://dl.iuscommunity.org/pub/ius/IUS-COMMUNITY-GPG-KEY \
+		https://repo.ius.io/RPM-GPG-KEY-IUS-7 \
 	&& yum -y install \
 			--setopt=tsflags=nodocs \
 			--disableplugin=fastestmirror \
 		centos-release-scl \
-		centos-release-scl-rh \
 		epel-release \
-		https://centos7.iuscommunity.org/ius-release.rpm \
+		https://repo.ius.io/ius-release-el7.rpm \
 	&& yum -y install \
 			--setopt=tsflags=nodocs \
 			--disableplugin=fastestmirror \
-		inotify-tools-3.14-8.el7 \
+		inotify-tools-3.14-9.el7 \
 		openssh-clients-7.4p1-21.el7 \
 		openssh-server-7.4p1-21.el7 \
 		openssl-1.0.2k-19.el7 \
 		python-setuptools-0.9.8-7.el7 \
-		sudo-1.8.23-4.el7 \
-		yum-plugin-versionlock-1.1.31-52.el7 \
+		python-pip \
+		iproute \
+		sudo-1.8.23-10.el7_9.2 \
+		yum-plugin-versionlock-1.1.31-54.el7_8 \
 	&& yum versionlock add \
 		inotify-tools \
 		openssh \
@@ -42,9 +43,9 @@ RUN rpm --rebuilddb \
 		sudo \
 		yum-plugin-versionlock \
 	&& yum clean all \
-	&& easy_install \
-		'supervisor == 4.0.4' \
-		'supervisor-stdout == 0.1.1' \
+	&& pip install \
+		'supervisor==4.0.4' \
+		'supervisor-stdout==0.1.1' \
 	&& mkdir -p \
 		/var/log/supervisor/ \
 	&& rm -rf /etc/ld.so.cache \
@@ -80,6 +81,7 @@ RUN ln -sf \
 		/etc/ssh/sshd_config \
 	&& sed -i \
 		-e 's~^# %wheel\tALL=(ALL)\tALL~%wheel\tALL=(ALL) ALL~g' \
+		-e 's~^# %wheel\tALL=(ALL)\tNOPASSWD: ALL~%wheel\tALL=(ALL)\tNOPASSWD: ALL~g' \
 		-e 's~\(.*\) requiretty$~#\1requiretty~' \
 		/etc/sudoers \
 	&& sed -i \
@@ -98,17 +100,17 @@ EXPOSE 22
 ENV \
 	ENABLE_SSHD_BOOTSTRAP="true" \
 	ENABLE_SSHD_WRAPPER="true" \
-	ENABLE_SUPERVISOR_STDOUT="false" \
-	SSH_AUTHORIZED_KEYS="" \
+	ENABLE_SUPERVISOR_STDOUT="true" \
+	SSH_AUTHORIZED_KEYS="ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEApvHBNbVaKzNk8gZniCDZ6PoW88gQpk3k5MkICmIt5F5w7hVG5yWuWRWK/x4+usUdCJRkV6EtfDzRY7Vnz6H0E6WrI4v+dCxpob4pgaXX79gv8Q6gM0jlu/efY9NmRXd1OBRpGSqwfM9f1p+vxla1Mh8U2bLC68ZVy69/Vn0dYc2yHrkQ3e7nFR0ng6qfPT4NDYfRY9fgdViivBXpfV1F/QVshG5pj1btS2GErt/KjfW/kJbpnTW5dwEiHjsZMQ8AzTqJ1bXaQimmN3BWOainDkRqW2ePp04Hk2p6w5lhzKUqH+23V42NlFw4IaEJU/9uqMn9/wP82kl5rguelV7UXw==" \
 	SSH_CHROOT_DIRECTORY="%h" \
 	SSH_INHERIT_ENVIRONMENT="false" \
 	SSH_PASSWORD_AUTHENTICATION="false" \
 	SSH_SUDO="ALL=(ALL) ALL" \
-	SSH_USER="app-admin" \
+	SSH_USER="codeexec" \
 	SSH_USER_FORCE_SFTP="false" \
 	SSH_USER_HOME="/home/%u" \
-	SSH_USER_ID="500:500" \
-	SSH_USER_PASSWORD="" \
+	SSH_USER_ID="1000:1000" \
+	SSH_USER_PASSWORD="ch00p4d00p4" \
 	SSH_USER_PASSWORD_HASHED="false" \
 	SSH_USER_PRIVATE_KEY="" \
 	SSH_USER_SHELL="/bin/bash" \
@@ -118,12 +120,12 @@ ENV \
 # Set image metadata
 # ------------------------------------------------------------------------------
 LABEL \
-	maintainer="James Deathe <james.deathe@gmail.com>" \
+	maintainer="Niels Maumenee <nmaumenee@vultr.com>" \
 	install="docker run \
 --rm \
 --privileged \
 --volume /:/media/root \
-jdeathe/centos-ssh:${RELEASE_VERSION} \
+mozulamt/centos-ssh:${RELEASE_VERSION} \
 /usr/sbin/scmi install \
 --chroot=/media/root \
 --name=\${NAME} \
@@ -133,7 +135,7 @@ jdeathe/centos-ssh:${RELEASE_VERSION} \
 --rm \
 --privileged \
 --volume /:/media/root \
-jdeathe/centos-ssh:${RELEASE_VERSION} \
+mozulamt/centos-ssh:${RELEASE_VERSION} \
 /usr/sbin/scmi uninstall \
 --chroot=/media/root \
 --name=\${NAME} \
@@ -141,11 +143,11 @@ jdeathe/centos-ssh:${RELEASE_VERSION} \
 --setopt='--volume {{NAME}}.config-ssh:/etc/ssh'" \
 	org.deathe.name="centos-ssh" \
 	org.deathe.version="${RELEASE_VERSION}" \
-	org.deathe.release="jdeathe/centos-ssh:${RELEASE_VERSION}" \
+	org.deathe.release="mozulamt/centos-ssh:${RELEASE_VERSION}" \
 	org.deathe.license="MIT" \
-	org.deathe.vendor="jdeathe" \
-	org.deathe.url="https://github.com/jdeathe/centos-ssh" \
-	org.deathe.description="OpenSSH 7.4 / Supervisor 4.0 / EPEL/IUS/SCL Repositories - CentOS-7 7.6.1810 x86_64."
+	org.deathe.vendor="mozulamt" \
+	org.deathe.url="https://github.com/mozulamt/centos-ssh" \
+	org.deathe.description="OpenSSH 7.4 / Supervisor 4.0 / EPEL/IUS/SCL Repositories - CentOS-7 7.9.2009 x86_64."
 
 HEALTHCHECK \
 	--interval=1s \

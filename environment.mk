@@ -4,7 +4,7 @@
 DOCKER_IMAGE_NAME := centos-ssh
 DOCKER_IMAGE_RELEASE_TAG_PATTERN := ^[1-2]\.[0-9]+\.[0-9]+$
 DOCKER_IMAGE_TAG_PATTERN := ^(latest|[1-2]\.[0-9]+\.[0-9]+)$
-DOCKER_USER := jdeathe
+DOCKER_USER := mozulamt
 SHPEC_ROOT := test/shpec
 
 # ------------------------------------------------------------------------------

@@ -45,7 +45,7 @@ function main ()
 		system-timezone -qq
 	)"
 
-	if ! ps axo command | grep -qE '^/usr/bin/python /usr/bin/supervisord'
+	if ! ps axo command | grep -qE '^/usr/bin/python2 /usr/bin/supervisord'
 	then
 		>&2 printf -- \
 			"supervisord not running"
