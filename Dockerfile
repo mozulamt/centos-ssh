@@ -1,6 +1,6 @@
 FROM centos:7.9.2009
 
-ARG RELEASE_VERSION="2.6.2"
+ARG RELEASE_VERSION=2.6.3
 
 # ------------------------------------------------------------------------------
 # - Import the RPM GPG keys for repositories
@@ -81,7 +81,7 @@ RUN ln -sf \
 		/etc/ssh/sshd_config \
 	&& sed -i \
 		-e 's~^# %wheel\tALL=(ALL)\tALL~%wheel\tALL=(ALL) ALL~g' \
-		-e 's~^# %wheel\tALL=(ALL)\tNOPASSWD: ALL~%wheel\tALL=(ALL)\tNOPASSWD: ALL~g' \
+		-e 's~^# %wheel[[:space:]]*ALL=(ALL)[[:space:]]*NOPASSWD: ALL~%wheel ALL=(ALL) NOPASSWD: ALL~g' \
 		-e 's~\(.*\) requiretty$~#\1requiretty~' \
 		/etc/sudoers \
 	&& sed -i \
